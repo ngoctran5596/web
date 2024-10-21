@@ -1,38 +1,61 @@
-.App {
-  text-align: center;
+*{margin: 0px; padding: 0px;}
+
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+
+body{
+  font-family: "Lato", sans-serif;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.headerWrapper .top-strip{
+  padding: 8px 0px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+.headerWrapper .top-strip p{
   color: white;
+  font-size: 12px;
+  font-weight: 500;
 }
 
-.App-link {
-  color: #61dafb;
+.headerWrapper .header{ width: 100%; height: auto;padding: 15px 0px;}
+
+.headerWrapper .header .part2 .countryDrop{
+  width: 150px; 
+  height: 60px; 
+  min-width: 150px;
+  color:#000 !important; 
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+  border-radius: 7px !important;
+  text-align: left;  
+  justify-content: space-between;
+  padding: 10px 20px !important;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+
+.headerWrapper .header .part2 .countryDrop .label{
+  line-height: 16px;
+  font-size: 12px !important;
+  text-transform: capitalize !important;
+  color: rgba(0,0, 0, 0.7) !important;
 }
+
+.headerWrapper .header .part2 .countryDrop .name{
+  line-height: 16px;
+  font-size: 14px !important; 
+  text-transform: capitalize !important; 
+  color: rgba(0,0, 0, 0.8) !important; 
+  font-weight: 700;
+}
+
+.headerWrapper .header .part2 .countryDrop span.ml-auto svg{
+  opacity: 0.3 !important;
+}
+
+.logoWrapper img{
+  width: 100%;
+  height: 64px;
+}
+
+.bg-blue{
+  background: #243A95;
+}
+
