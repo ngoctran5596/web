@@ -8,7 +8,14 @@
 body {
   font-family: "Lato", sans-serif;
 }
-
+@media (min-width:1300px){
+  .container, .container-lg,.container-md,.container-sm,.container-xl{
+    max-width: 1200px;
+  }
+}
+.container{
+  max-width: 90%;
+}
 .headerWrapper .top-strip {
   padding: 8px 0px;
 }
@@ -97,7 +104,7 @@ header .headerSearch button {
   border-radius: 40px;
 }
 header .headerSearch button svg {
-  font-size: 25px;
+  font-size: auto;
 }
 header .part3 .circle {
   align-items: center;
@@ -109,5 +116,71 @@ header .part3 .circle {
   color: #000;
 }
 header .part3 .circle svg {
-  font-size: 24px;
+  font-size: auto;
+}
+.cardTab .price{font-size: 18px !important; color: rgba(0, 0, 0, 0.8); font-weight: 700;}
+.cardTab button{background: #fff1ee !important;}
+.cardTab button svg{color: #ea2b0f !important;}
+.cardTab .count{
+  position: absolute;
+  top: -6px;
+  right: -4px;
+  width: 20px;
+  height: 20px;
+  color: #fff;
+  background: #ea2b0f;
+  border-radius: 20px;
+}
+
+nav .allCatTab{
+  background: #2bbef9;
+  padding: 8px 20px !important;
+  border-radius: 30px !important;
+}
+
+nav .allCatTab *{
+  color: #ffffff;
+}
+
+nav .allCatTab:hover{
+  background: #2bbef9;
+}
+
+nav .allCatTab .text{
+  font-weight: 800;
+}
+
+nav .allCatTab svg{
+  font-size: auto !important;
+}
+
+nav .navPart1{
+  max-width: 20%;
+  flex: 0 0 20%;
+}
+nav .navPart2{
+  max-width: 80%;
+  flex: 0 0 80%;
+}
+
+nav .navPart2 ul {
+  margin-bottom: 0px;
+}
+
+nav .navPart2 ul li a {
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.8);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  padding: 10px 13px;
+  transition: all 0.2s ease-in-out;
+  border-radius: 30px;
+}
+
+nav .navPart2 ul li a:hover{
+  color: #2bbef9;
+  background: #f0faff;
 }
