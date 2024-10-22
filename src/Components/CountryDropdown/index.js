@@ -1,46 +1,121 @@
-import { FaAngleDown } from 'react-icons/fa'
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import Avatar from '@mui/material/Avatar';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import DialogTitle from '@mui/material/DialogTitle';
-import Dialog from '@mui/material/Dialog';
-import PersonIcon from '@mui/icons-material/Person';
-import AddIcon from '@mui/icons-material/Add';
-import Typography from '@mui/material/Typography';
-import { blue } from '@mui/material/colors';
-const emails = ['username@gmail.com', 'user02@gmail.com'];
+import { FaAngleDown } from "react-icons/fa";
+import * as React from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import { IoIosSearch } from "react-icons/io";
+import { MdClose } from "react-icons/md";
+import Slide from "@mui/material/Slide";
+import { MyContext } from "../../App";
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 function CountryDropdown(props) {
-    const { onClose, selectedValue, open } = props;
+  const context = React.useContext(MyContext);
+  const [isOpenModal, setOpenModal] = React.useState(false);
+  const [selectedTab, setSelectedTab] = React.useState(null);
+  const [countryList, setCountryList] = React.useState([]);
+  const selectCountry = (index, country) => {
+    setSelectedTab(index);
+    setOpenModal(false);
+    context.setSelectedCountryApp(country);
+  };
 
-    const handleClose = () => {
-        onClose(selectedValue);
-    };
+  React.useEffect(() => {
+    setCountryList(context.countryList);
+  }, []);
 
-    const handleListItemClick = (value) => {
-        onClose(value);
-    };
-
-    return (
-        <>
-            <Button className='countryDrop'>
-                <div className='info d-flex  flex-column'>
-                    <span className='label'>Your location</span>
-                    <span className='name'>Viet Nam</span>
-                </div>
-                <span className='ml-auto'>
-                    <FaAngleDown />
-                </span>
-            </Button>
-            <Dialog className='locationDropDown' open={true}>
-                <h1>ok</h1>
-            </Dialog>
-        </>
-    )
+  const filterList = (e) => {
+    const keyWord = e.target.value.toLowerCase();
+    let list = [];
+    if (keyWord !== "") {
+      let array = countryList?.filter((item) => {
+        return item?.country?.toLowerCase().includes(keyWord);
+      });
+      if (array.length === 0) {
+        array = context.countryList?.filter((item) => {
+          return item?.country?.toLowerCase().includes(keyWord);
+        });
+      }
+      list = array;
+    } else {
+      list = context.countryList;
+    }
+    setCountryList(list);
+  };
+  return (
+    <>
+      <Button
+        className="countryDrop"
+        onClick={() => {
+          setOpenModal(true);
+        }}
+      >
+        <div className="info d-flex  flex-column">
+          <span className="label">Your location</span>
+          <span className="name">
+            {context.selectedCountryApp !== ""
+              ? context.selectedCountryApp
+              : "Select location"}
+          </span>
+        </div>
+        <span className="ml-auto">
+          <FaAngleDown />
+        </span>
+      </Button>
+      <Dialog
+        className="locationModal"
+        onClose={() => setOpenModal(false)}
+        keepMounted
+        TransitionComponent={Transition}
+        open={isOpenModal}
+      >
+        <h4 className="mb-0">Choose your Delivery Location</h4>
+        <p>Enter your address and we will specify the offer for your area.</p>
+        <Button
+          className="close_"
+          onClick={() => {
+            setOpenModal(false);
+          }}
+        >
+          <MdClose />
+        </Button>
+        <div className="headerSearch w-100">
+          <input
+            type="text"
+            placeholder="Search for product ..."
+            onChange={(e) => filterList(e)}
+          />
+          <Button>
+            <IoIosSearch />
+          </Button>
+        </div>
+        <ul className="countryList mt-3">
+          {countryList.length !== 0 ? (
+            countryList.map((i, index) => {
+              return (
+                <li key={index}>
+                  <Button
+                    onClick={() => {
+                      selectCountry(index, i.country);
+                    }}
+                    className={`${selectedTab === index ? "active" : ""}`}
+                  >
+                    {i?.country}
+                  </Button>
+                </li>
+              );
+            })
+          ) : (
+            <div>
+              <span>No data</span>
+            </div>
+          )}
+        </ul>
+      </Dialog>
+    </>
+  );
 }
 
-export default CountryDropdown
+export default CountryDropdown;
