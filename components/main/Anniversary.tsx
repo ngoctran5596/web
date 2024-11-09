@@ -156,7 +156,7 @@ const Anniversary = () => {
         })}
       </Swiper>
       <AnimatePresence>
-        {Boolean(selectedId) && (
+        {selectedId && (
           <motion.div
             key="modal"
             initial={{ scale: 0 }} // Bắt đầu với kích thước nhỏ
