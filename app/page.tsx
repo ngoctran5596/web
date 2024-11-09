@@ -1,5 +1,5 @@
 import Hero from "@/components/main/Hero";
-import ScrollViewImages from "@/components/main/ScrollViewImages";
+// import ScrollViewImages from "@components/main/ScrollViewImages";
 import Anniversary from "@/components/main/Anniversary";
 import Footer from "@/components/main/Footer";
 
@@ -11,7 +11,7 @@ export default function Home() {
         <div className="hidden md:block">
           <Anniversary />
         </div>
-        <ScrollViewImages />
+        {/* <ScrollViewImages /> */}
         <Footer />
       </div>
     </main>
