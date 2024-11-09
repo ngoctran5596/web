@@ -1,15 +1,15 @@
 "use client";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import useSWR from "swr";
 interface AnniversaryProps {
   _id: string;
   name: string;
-  image: string;
+  image: Array<string>;
   description: string;
 }
 
-import { useInView } from "framer-motion";
+import { AnimatePresence, useInView } from "framer-motion";
 import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
@@ -20,6 +20,8 @@ import "swiper/css/pagination";
 
 const Anniversary = () => {
   const ref = React.useRef(null);
+  const [selectedId, setSelectedId] = useState<string | undefined>();
+
   const isInView = useInView(ref, {
     once: false, // true nếu bạn chỉ muốn trigger một lần
     amount: 0.2, // Kích hoạt khi 20% component hiển thị
@@ -34,7 +36,6 @@ const Anniversary = () => {
   console.log("isInView", isInView);
   React.useEffect(() => {
     if (isInView) {
-      console.log("User đã scroll đến Anniversary section!");
       // Thêm các hành động khác khi user scroll đến đây
     }
   }, [isInView]);
@@ -53,7 +54,7 @@ const Anniversary = () => {
         margin: "0px 0px 0px 0px",
       }}
       transition={{ duration: 0.8 }}
-      className="mt-[200px] min-h-screen flex items-center relative overflow-hidden"
+      className="mt-[200px] min-h-screen flex items-center relative overflow-hidden z-20"
       style={{ transform: "scale(0.9)" }}
     >
       <video
@@ -88,17 +89,46 @@ const Anniversary = () => {
               >
                 <div className="container mx-auto px-2">
                   <div className="grid grid-cols-12 gap-6">
-                    <div className="col-span-8 relative">
-                      <div className="relativ w-full bg-white rounded-lg  h-[500px] overflow-hidden">
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          fill
-                          className="object-cover"
-                        />
+                    <div className="col-span-8 relative rounded-lg overflow-hidden">
+                      <div className="grid grid-cols-2 h-[500px] overflow-hidden">
+                        <div className="relative w-full h-full bg-slate-700">
+                          <div className="relative w-full h-full z-40 ">
+                            <Image
+                              onClick={() => {
+                                setSelectedId(item?.image?.[0]);
+                              }}
+                              src={item?.image?.[0]}
+                              alt={item?.image?.[0]}
+                              style={{ objectFit: "cover" }}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        </div>
+                        <div
+                          className={`relative w-full h-full grid grid-cols-${
+                            item?.image?.slice(1)?.length
+                          } bg-slate-700`}
+                        >
+                          {item?.image
+                            ?.slice(1) // Sử dụng slice để lấy các phần tử từ chỉ số 1 trở đi
+                            ?.map((url: string) => (
+                              <div key={url} className="relative w-full h-full">
+                                <Image
+                                  src={url}
+                                  onClick={() => {
+                                    setSelectedId(url);
+                                  }}
+                                  alt={url}
+                                  style={{ objectFit: "cover" }}
+                                  fill
+                                  className="object-cover"
+                                />
+                              </div>
+                            ))}
+                        </div>
                       </div>
                     </div>
-
                     <motion.div
                       className="col-span-4 h-[500px]"
                       style={{ marginLeft: "-10%", marginBottom: "-20px" }}
@@ -125,6 +155,26 @@ const Anniversary = () => {
           );
         })}
       </Swiper>
+      <AnimatePresence>
+        {Boolean(selectedId) && (
+          <motion.div
+            key="modal"
+            initial={{ scale: 0 }} // Bắt đầu với kích thước nhỏ
+            animate={{ scale: 1 }} // Phóng to đến kích thước bình thường
+            exit={{ scale: 0 }} // Khi thoát, trở về kích thước nhỏ
+            transition={{
+              ease: "linear",
+              duration: 0.5, // Thay đổi thời gian nếu cần
+            }}
+            onClick={() => setSelectedId(undefined)}
+            className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center"
+          >
+            <div className="bg-white p-4 rounded-lg">
+              <Image src={selectedId} alt="Selected" width={500} height={300} />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.section>
   );
 };

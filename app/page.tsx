@@ -1,6 +1,7 @@
 import Hero from "@/components/main/Hero";
 import ScrollViewImages from "@/components/main/ScrollViewImages";
 import Anniversary from "@/components/main/Anniversary";
+import Footer from "@/components/main/Footer";
 
 export default function Home() {
   return (
@@ -11,6 +12,7 @@ export default function Home() {
           <Anniversary />
         </div>
         <ScrollViewImages />
+        <Footer />
       </div>
     </main>
   );
