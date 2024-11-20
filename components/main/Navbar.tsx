@@ -4,21 +4,21 @@ import React from "react";
 
 const Navbar = () => {
   return (
-    <div className="w-full h-[65px] fixed top-0 shadow-lg shadow-[#2A0E61]/50 bg-[#03001417] backdrop-blur-md z-50 px-10">
-      <div className="w-full h-full flex flex-row items-center justify-between m-auto px-[10px]">
+    <div className="container fixed top-0 z-50 h-[65px] bg-[#22185c17] px-10 shadow-lg shadow-[#2A0E61]/50 backdrop-blur-md">
+      <div className="m-auto flex h-full w-full flex-row items-center justify-between px-[10px]">
         <a
           href="#about-me"
-          className="h-auto w-auto flex flex-row items-center"
+          className="flex h-auto w-auto flex-row items-center"
         >
           <Image
             src="/NavLogo.png"
             alt="logo"
             width={70}
             height={70}
-            className="cursor-pointer hover:animate-slowspin"
+            className="hover:animate-slowspin cursor-pointer"
           />
 
-          <span className="text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500">
+          <span className="bg-gradient-to-r from-purple-500 to-cyan-500 bg-clip-text text-3xl font-semibold text-transparent">
             Châu Ngọc
           </span>
         </a>

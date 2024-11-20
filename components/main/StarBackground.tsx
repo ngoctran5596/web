@@ -9,7 +9,7 @@ import * as THREE from "three";
 const StarBackground = (props: React.PropsWithChildren<unknown>) => {
   const ref = useRef<THREE.Points>(null);
   const [sphere] = useState(() =>
-    random.inSphere(new Float32Array(5000), { radius: 1.2 })
+    random.inSphere(new Float32Array(5000), { radius: 1.2 }),
   );
 
   useFrame((state, delta) => {
@@ -35,7 +35,7 @@ const StarBackground = (props: React.PropsWithChildren<unknown>) => {
 };
 
 const StarsCanvas = () => (
-  <div className="w-full h-auto fixed inset-0 z-[4]">
+  <div className="fixed inset-0 -z-10 h-auto w-full">
     <Canvas camera={{ position: [0, 0, 1] }}>
       <Suspense fallback={null}>
         <StarBackground />

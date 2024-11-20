@@ -6,7 +6,7 @@ import Footer from "@/components/main/Footer";
 export default function Home() {
   return (
     <main className="h-full w-full">
-      <div className="flex flex-col h-[850px] gap=20">
+      <div className="container mx-auto flex flex-col gap-20">
         <Hero />
         <div className="hidden md:block">
           <Anniversary />

@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import React, { useState } from "react";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 interface AnniversaryProps {
   _id: string;
   name: string;
@@ -9,7 +9,7 @@ interface AnniversaryProps {
   description: string;
 }
 
-import { AnimatePresence, useInView } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
@@ -18,31 +18,186 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-const Anniversary = () => {
-  const ref = React.useRef(null);
-  const [selectedId, setSelectedId] = useState<string | undefined>();
+const ImageGrid = ({
+  images,
+  setSelectedId,
+  description,
+}: {
+  images: Array<string>;
+  setSelectedId: (id: { url: string; description: string } | undefined) => void;
+  description: string;
+}) => {
+  return (
+    <div className="relative col-span-8 overflow-hidden rounded-lg">
+      <div className="grid h-[500px] grid-cols-2 overflow-hidden">
+        <div className="relative h-full w-full bg-slate-700">
+          <div className="relative z-40 h-full w-full">
+            <Image
+              onClick={() => {
+                setSelectedId({
+                  url: images[0],
+                  description: description,
+                });
+              }}
+              src={images[0]}
+              alt={images[0]}
+              style={{ objectFit: "cover" }}
+              fill
+              className="object-cover"
+            />
+          </div>
+        </div>
+        <div
+          className={`relative grid h-full w-full grid-cols-${
+            images.slice(1).length
+          } bg-slate-700`}
+        >
+          {images.slice(1).map((url: string) => (
+            <div key={url} className="relative h-full w-full">
+              <Image
+                src={url}
+                onClick={() => {
+                  setSelectedId({
+                    url: url,
+                    description: description,
+                  });
+                }}
+                alt={url}
+                style={{ objectFit: "cover" }}
+                fill
+                className="object-cover"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
-  const isInView = useInView(ref, {
-    once: false, // true nếu bạn chỉ muốn trigger một lần
-    amount: 0.2, // Kích hoạt khi 20% component hiển thị
-    margin: "100px 0px 100px 0px",
-  });
+const EditableDescription = ({
+  item,
+  inputValue,
+  setInputValue,
+  isLoading,
+  setIsLoading,
+  setEdit,
+  isEdit,
+}: {
+  item: AnniversaryProps;
+  inputValue: string;
+  setInputValue: (value: string) => void;
+  isLoading: boolean;
+  setIsLoading: (loading: boolean) => void;
+  setEdit: (id: string | undefined) => void;
+  isEdit: string | undefined;
+}) => {
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
+    setInputValue(e.target.value);
+  };
+
+  const onSubmitDescription = async () => {
+    setIsLoading(true);
+    if (!inputValue) {
+      setEdit(undefined); // Optionally close the edit mode
+      setIsLoading(false);
+      return;
+    }
+    const updatedDescription = inputValue;
+    await fetch(
+      `https://server-wheat-eta-51.vercel.app/api/v1/category/update/${item._id}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          description: inputValue,
+        }), // Gửi mô tả mới
+      },
+    );
+    mutate(
+      "https://server-wheat-eta-51.vercel.app/api/v1/category",
+      (data) => {
+        return data.map((d: AnniversaryProps) =>
+          d._id === item._id
+            ? {
+                ...d,
+                description: updatedDescription,
+              }
+            : d,
+        );
+      },
+      false,
+    );
+    setEdit(undefined); // Optionally close the edit mode
+    setIsLoading(false);
+    setInputValue("");
+  };
+
+  return (
+    <div className="flex h-full items-end">
+      <div className="relative w-full rounded-lg border-2 border-white bg-white p-6 shadow-lg">
+        <h1 className="mb-6 text-2xl font-bold text-black">{item.name}</h1>
+        {isEdit === item._id ? (
+          <>
+            <textarea
+              value={inputValue || item.description}
+              onChange={handleChange}
+              className="z-50 w-full rounded border border-gray-300 p-2 text-lg text-black"
+            />
+            <div className="p-2">
+              <button
+                onClick={onSubmitDescription}
+                className="z-50 mt-2 rounded bg-blue-500 p-4 text-white"
+                disabled={isLoading}
+                style={{
+                  pointerEvents: isLoading ? "none" : "auto",
+                }}
+              >
+                {isLoading ? "Đang chỉnh sửa..." : "Hoàn tất chỉnh sửa"}
+              </button>
+            </div>
+          </>
+        ) : (
+          <p className="text-lg text-black">
+            {item.description}
+            <button
+              onClick={() => setEdit(item._id)}
+              className="ml-2 text-blue-500"
+            >
+              ✏️
+            </button>
+          </p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const Anniversary = () => {
+  const [selectedId, setSelectedId] = useState<
+    { url: string; description: string } | undefined
+  >(undefined);
+
+  const [isEdit, setEdit] = useState<string | undefined>();
+
+  const [inputValue, setInputValue] = useState("");
+
+  const [isLoadingUpdate, setIsLoading] = useState(false);
 
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const { data, error, isLoading } = useSWR(
-    "http://localhost:5000/api/v1/category",
-    fetcher
+    "https://server-wheat-eta-51.vercel.app/api/v1/category",
+    fetcher,
   );
-  console.log("isInView", isInView);
-  React.useEffect(() => {
-    if (isInView) {
-      // Thêm các hành động khác khi user scroll đến đây
-    }
-  }, [isInView]);
 
   if (isLoading) return <div>Loading...</div>;
+
   if (error) return <div>Error loading data</div>;
+
   if (!data || data.length === 0) return <div>No data available</div>;
+
   return (
     <motion.section
       id="Anniversary"
@@ -54,7 +209,7 @@ const Anniversary = () => {
         margin: "0px 0px 0px 0px",
       }}
       transition={{ duration: 0.8 }}
-      className="mt-[200px] min-h-screen flex items-center relative overflow-hidden z-20"
+      className="relative z-20 mt-[200px] flex min-h-screen items-center overflow-hidden"
       style={{ transform: "scale(0.9)" }}
     >
       <video
@@ -63,90 +218,52 @@ const Anniversary = () => {
         muted
         playsInline
         style={{ border: "none", outline: "none" }}
-        className="absolute top-0 left-0  w-[100%] h-[100%] object-cover -z-10  opacity-50"
+        className="absolute left-0 top-0 -z-10 h-[100%] w-[100%] object-cover opacity-50"
       >
         <source src="/video3.mp4" type="video/mp4" />
       </video>
-
-      {/* <div className="absolute top-0 left-0 w-full h-full bg-black/20 -z-10" /> */}
       <Swiper
         modules={[Navigation, Pagination]}
         spaceBetween={30}
         slidesPerView={1}
         navigation={true}
         pagination={{ clickable: true }}
-        className="w-full relative z-20 !overflow-visible justify-center items-center h-[500px] "
+        className="relative z-20 h-[500px] w-full items-center justify-center !overflow-visible"
       >
         {data.map((item: AnniversaryProps) => {
           return (
             <SwiperSlide key={item._id} className="cursor-pointer">
               <motion.section
-                className="w-full py-8 bg-white"
+                className="w-full bg-white py-8"
                 initial={{ opacity: 0, y: 100 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
               >
                 <div className="container mx-auto px-2">
-                  <div className="grid grid-cols-12 gap-6">
-                    <div className="col-span-8 relative rounded-lg overflow-hidden">
-                      <div className="grid grid-cols-2 h-[500px] overflow-hidden">
-                        <div className="relative w-full h-full bg-slate-700">
-                          <div className="relative w-full h-full z-40 ">
-                            <Image
-                              onClick={() => {
-                                setSelectedId(item?.image?.[0]);
-                              }}
-                              src={item?.image?.[0]}
-                              alt={item?.image?.[0]}
-                              style={{ objectFit: "cover" }}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                        </div>
-                        <div
-                          className={`relative w-full h-full grid grid-cols-${
-                            item?.image?.slice(1)?.length
-                          } bg-slate-700`}
-                        >
-                          {item?.image
-                            ?.slice(1) // Sử dụng slice để lấy các phần tử từ chỉ số 1 trở đi
-                            ?.map((url: string) => (
-                              <div key={url} className="relative w-full h-full">
-                                <Image
-                                  src={url}
-                                  onClick={() => {
-                                    setSelectedId(url);
-                                  }}
-                                  alt={url}
-                                  style={{ objectFit: "cover" }}
-                                  fill
-                                  className="object-cover"
-                                />
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                    </div>
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
+                    <ImageGrid
+                      images={item.image}
+                      setSelectedId={setSelectedId}
+                      description={item.description}
+                    />
                     <motion.div
-                      className="col-span-4 h-[500px]"
+                      className="col-span-12 hidden md:col-span-4 md:block"
                       style={{ marginLeft: "-10%", marginBottom: "-20px" }}
                       initial={{ opacity: 0, x: 100 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 2, delay: 0.2 }}
                     >
-                      <div className="h-full flex items-end">
-                        <div className=" relative p-6 rounded-lg shadow-lg border-2 border-white bg-white w-full">
-                          <h1 className="text-black text-2xl mb-6 font-bold">
-                            {item.name}
-                          </h1>
-                          <p className="text-black text-lg">
-                            {item.description}
-                          </p>
-                        </div>
-                      </div>
+                      <EditableDescription
+                        item={item}
+                        inputValue={inputValue}
+                        setInputValue={setInputValue}
+                        isLoading={isLoadingUpdate}
+                        setIsLoading={setIsLoading}
+                        setEdit={setEdit}
+                        isEdit={isEdit}
+                      />
                     </motion.div>
                   </div>
                 </div>
@@ -156,7 +273,7 @@ const Anniversary = () => {
         })}
       </Swiper>
       <AnimatePresence>
-        {selectedId && (
+        {selectedId?.url && (
           <motion.div
             key="modal"
             initial={{ scale: 0 }} // Bắt đầu với kích thước nhỏ
@@ -167,10 +284,15 @@ const Anniversary = () => {
               duration: 0.5, // Thay đổi thời gian nếu cần
             }}
             onClick={() => setSelectedId(undefined)}
-            className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
           >
-            <div className="bg-white p-4 rounded-lg">
-              <Image src={selectedId} alt="Selected" width={500} height={300} />
+            <div className="rounded-lg bg-white p-4">
+              <Image
+                src={selectedId.url}
+                alt="Selected"
+                width={500}
+                height={300}
+              />
             </div>
           </motion.div>
         )}

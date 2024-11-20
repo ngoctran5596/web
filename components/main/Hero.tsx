@@ -6,12 +6,12 @@ import AudioPlayer from "../audio/AudioPlayer";
 
 function Hero() {
   return (
-    <div className="relative flex flex-col h-full w-full" id="hero">
+    <div className="relative" id="hero">
       <video
         autoPlay
         muted
         loop
-        className="rotate-180 absolute top-[-340px] left-0 z-[1] w-full h-full object-cover"
+        className="absolute left-0 top-[-340px] -z-[1] h-full w-full rotate-180 object-cover"
       >
         <source src="/blackhole.webm" type="video/webm" />
       </video>
